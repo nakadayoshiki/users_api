@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/mysql" //mysql との接続用
 	"github.com/joho/godotenv"
 )
 
@@ -25,7 +25,8 @@ const (
 	mysqlUsersSchema   = "mysql_users_schemaname"
 )
 
-func init() {
+// Init - users_db接続
+func Init() (db *gorm.DB) {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -36,12 +37,10 @@ func init() {
 	schema := os.Getenv(mysqlUsersSchema)
 
 	dataSourceName := fmt.Sprintf("%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local", username, password, host, schema)
-	db, err := gorm.Open("mysql", dataSourceName)
+	db, err = gorm.Open("mysql", dataSourceName)
 	if err != nil {
 		panic("failed to connect database")
 	}
-	defer db.Close()
 
-	// // Migrate the schema
-	db.AutoMigrate(&User{})
+	return
 }
